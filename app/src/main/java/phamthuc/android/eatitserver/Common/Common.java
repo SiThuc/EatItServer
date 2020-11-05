@@ -1,5 +1,6 @@
 package phamthuc.android.eatitserver.Common;
 
+import phamthuc.android.eatitserver.Model.CategoryModel;
 import phamthuc.android.eatitserver.Model.ServerUserModel;
 
 public class Common {

@@ -1,10 +1,10 @@
-package phamthuc.android.eatitserver.Common;
+package phamthuc.android.eatitserver.Model;
 
-public class SizeModel {
+public class AddonModel {
     private String name;
     private Long price;
 
-    public SizeModel() {
+    public AddonModel() {
     }
 
     public String getName() {
@@ -22,4 +22,5 @@ public class SizeModel {
     public void setPrice(Long price) {
         this.price = price;
     }
+
 }

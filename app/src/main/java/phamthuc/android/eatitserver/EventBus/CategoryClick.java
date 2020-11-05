@@ -1,6 +1,6 @@
 package phamthuc.android.eatitserver.EventBus;
 
-import phamthuc.android.eatitserver.Common.CategoryModel;
+import phamthuc.android.eatitserver.Model.CategoryModel;
 
 public class CategoryClick {
     private boolean success;

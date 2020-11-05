@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import phamthuc.android.eatitserver.Callback.ICategoryCallbackListener;
-import phamthuc.android.eatitserver.Common.CategoryModel;
+import phamthuc.android.eatitserver.Model.CategoryModel;
 import phamthuc.android.eatitserver.Common.Common;
 
 public class CategoryViewModel extends ViewModel implements ICategoryCallbackListener {
@@ -37,7 +37,7 @@ public class CategoryViewModel extends ViewModel implements ICategoryCallbackLis
         return categoryListMutable;
     }
 
-    private void loadCategories() {
+    public void loadCategories() {
         List<CategoryModel> tempList = new ArrayList<>(  );
         DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference( Common.CATEGORY_REF);
         categoryRef.addListenerForSingleValueEvent( new ValueEventListener() {

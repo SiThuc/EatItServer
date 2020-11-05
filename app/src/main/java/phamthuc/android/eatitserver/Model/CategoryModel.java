@@ -1,4 +1,4 @@
-package phamthuc.android.eatitserver.Common;
+package phamthuc.android.eatitserver.Model;
 
 import java.util.List;
 

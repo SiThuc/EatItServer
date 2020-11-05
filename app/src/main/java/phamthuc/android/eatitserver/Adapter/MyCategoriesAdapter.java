@@ -20,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import phamthuc.android.eatitserver.Callback.IRecyclerClickListener;
-import phamthuc.android.eatitserver.Common.CategoryModel;
+import phamthuc.android.eatitserver.Model.CategoryModel;
 import phamthuc.android.eatitserver.Common.Common;
 import phamthuc.android.eatitserver.EventBus.CategoryClick;
 import phamthuc.android.eatitserver.R;
