@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             dialog.dismiss();
                             Toast.makeText( MainActivity.this, "Congratulation! Register success! Admin wil check and active you soon", Toast.LENGTH_SHORT ).show();
-                            //goToHomeActivity(serverUserModel);
+                            goToHomeActivity(serverUserModel);
                         }
                     } );
 
