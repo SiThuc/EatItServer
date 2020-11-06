@@ -1,6 +1,7 @@
 package phamthuc.android.eatitserver.Common;
 
 import phamthuc.android.eatitserver.Model.CategoryModel;
+import phamthuc.android.eatitserver.Model.FoodModel;
 import phamthuc.android.eatitserver.Model.ServerUserModel;
 
 public class Common {
@@ -10,4 +11,5 @@ public class Common {
     public static final int FULL_WIDTH_COLUMN = 1;
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
+    public static FoodModel selectedFood;
 }
