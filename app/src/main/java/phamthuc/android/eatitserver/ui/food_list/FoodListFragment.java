@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,10 +50,12 @@ import dmax.dialog.SpotsDialog;
 import phamthuc.android.eatitserver.Adapter.MyFoodListAdapter;
 import phamthuc.android.eatitserver.Common.Common;
 import phamthuc.android.eatitserver.Common.MySwipeHelper;
+import phamthuc.android.eatitserver.EventBus.AddonSizeEditEvent;
 import phamthuc.android.eatitserver.EventBus.ChangeMenuClick;
 import phamthuc.android.eatitserver.EventBus.ToastEvent;
 import phamthuc.android.eatitserver.Model.FoodModel;
 import phamthuc.android.eatitserver.R;
+import phamthuc.android.eatitserver.SizeAddonEditActivity;
 
 public class FoodListFragment extends Fragment {
 
@@ -108,7 +111,13 @@ public class FoodListFragment extends Fragment {
 
         layoutAnimationController = AnimationUtils.loadLayoutAnimation( getContext(), R.anim.layout_item_from_left );
 
-        MySwipeHelper mySwipeHelper = new MySwipeHelper(getContext(), recycler_food_list, 300) {
+        //Get Size
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics( displayMetrics );
+        int width = displayMetrics.widthPixels;
+
+
+        MySwipeHelper mySwipeHelper = new MySwipeHelper(getContext(), recycler_food_list, width/6) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buf) {
                 buf.add(new MyButton( getContext(), "Delete", 30, 0, Color.parseColor("#9b0000"),
@@ -134,6 +143,21 @@ public class FoodListFragment extends Fragment {
                         pos -> {
                             showUpdateDialog(pos);
 
+                        }));
+                buf.add(new MyButton( getContext(), "Size", 30, 0, Color.parseColor("#12005e"),
+                        pos -> {
+                            Common.selectedFood = foodModelList.get( pos );
+                            startActivity( new Intent( getContext(), SizeAddonEditActivity.class ) );
+                            EventBus.getDefault().postSticky( new AddonSizeEditEvent(false, pos) );
+
+
+                        }));
+
+                buf.add(new MyButton( getContext(), "Addon", 30, 0, Color.parseColor("#336699"),
+                        pos -> {
+                            Common.selectedFood = foodModelList.get( pos );
+                            startActivity( new Intent( getContext(), SizeAddonEditActivity.class ) );
+                            EventBus.getDefault().postSticky( new AddonSizeEditEvent(true, pos) );
                         }));
             }
         };
