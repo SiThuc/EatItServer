@@ -35,6 +35,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,8 @@ import dmax.dialog.SpotsDialog;
 import phamthuc.android.eatitserver.Adapter.MyFoodListAdapter;
 import phamthuc.android.eatitserver.Common.Common;
 import phamthuc.android.eatitserver.Common.MySwipeHelper;
+import phamthuc.android.eatitserver.EventBus.ChangeMenuClick;
+import phamthuc.android.eatitserver.EventBus.ToastEvent;
 import phamthuc.android.eatitserver.Model.FoodModel;
 import phamthuc.android.eatitserver.R;
 
@@ -63,6 +67,7 @@ public class FoodListFragment extends Fragment {
     private FoodListViewModel foodListViewModel;
 
     private List<FoodModel> foodModelList;
+
 
     Unbinder unbinder;
     @BindView( R.id.recycler_food_list )
@@ -223,10 +228,7 @@ public class FoodListFragment extends Fragment {
                 .addOnCompleteListener( task -> {
                     if(task.isSuccessful()){
                         foodListViewModel.getMutableLiveDataFoodList();
-                        if(isDeleted)
-                            Toast.makeText( getContext(), "Delete success!", Toast.LENGTH_SHORT ).show();
-                        else
-                            Toast.makeText( getContext(), "Update success!", Toast.LENGTH_SHORT ).show();
+                        EventBus.getDefault().postSticky( new ToastEvent( !isDeleted , true) );
                     }
                 } );
     }
@@ -240,5 +242,11 @@ public class FoodListFragment extends Fragment {
                 img_food.setImageURI( imageUri );
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().postSticky( new ChangeMenuClick(true) );
+        super.onDestroy();
     }
 }

@@ -29,6 +29,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,7 @@ import dmax.dialog.SpotsDialog;
 import phamthuc.android.eatitserver.Adapter.MyCategoriesAdapter;
 import phamthuc.android.eatitserver.Common.Common;
 import phamthuc.android.eatitserver.Common.MySwipeHelper;
+import phamthuc.android.eatitserver.EventBus.ToastEvent;
 import phamthuc.android.eatitserver.Model.CategoryModel;
 import phamthuc.android.eatitserver.R;
 
@@ -91,7 +94,7 @@ public class CategoryFragment extends Fragment {
         storageReference = storage.getReference();
 
         dialog = new SpotsDialog.Builder().setContext( getContext() ).setCancelable( false ).build();
-        dialog.show();
+        //dialog.show();
         layoutAnimationController = AnimationUtils.loadLayoutAnimation( getContext(), R.anim.layout_item_from_left );
         LinearLayoutManager layoutManager = new LinearLayoutManager( getContext());
         recycler_menu.setLayoutManager( layoutManager );
@@ -185,7 +188,7 @@ public class CategoryFragment extends Fragment {
                     }
                 } ).addOnCompleteListener( task -> {
                     categoryViewModel.loadCategories();
-                    Toast.makeText(getContext() , "Update success", Toast.LENGTH_SHORT ).show();
+                    EventBus.getDefault().postSticky( new ToastEvent(true, false) );
                 } );
     }
 
