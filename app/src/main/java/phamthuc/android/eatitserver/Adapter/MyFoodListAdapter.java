@@ -51,12 +51,15 @@ public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.My
             Common.selectedFood.setKey( String.valueOf( pos ) );
             //EventBus.getDefault().postSticky( new FoodItemClick(true, foodModelList.get( pos )) );
         } );
-
     }
 
     @Override
     public int getItemCount() {
         return foodModelList.size();
+    }
+
+    public FoodModel getItemAtPosition(int pos){
+        return foodModelList.get( pos );
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

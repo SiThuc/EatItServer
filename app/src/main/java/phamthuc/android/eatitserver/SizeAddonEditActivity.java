@@ -16,9 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.greenrobot.eventbus.EventBus;
@@ -129,8 +126,6 @@ public class SizeAddonEditActivity extends AppCompatActivity {
                             } );
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                }else{
-
                 }
                 break;
 
