@@ -1,5 +1,12 @@
 package phamthuc.android.eatitserver.Common;
 
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
+import android.widget.TextView;
+
 import phamthuc.android.eatitserver.Model.CategoryModel;
 import phamthuc.android.eatitserver.Model.FoodModel;
 import phamthuc.android.eatitserver.Model.ServerUserModel;
@@ -12,4 +19,14 @@ public class Common {
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static FoodModel selectedFood;
+
+    public static void setSpanString(String welcome, String name, TextView textView) {
+        SpannableStringBuilder builder = new SpannableStringBuilder(  );
+        builder.append( welcome );
+        SpannableString spannableString = new SpannableString( name );
+        StyleSpan boldSpan = new StyleSpan( Typeface.BOLD );
+        spannableString.setSpan( boldSpan, 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE );
+        builder.append(spannableString);
+        textView.setText( builder, TextView.BufferType.SPANNABLE );
+    }
 }

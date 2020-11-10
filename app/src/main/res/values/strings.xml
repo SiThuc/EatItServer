@@ -15,4 +15,6 @@
     <string name="best_deals">Best Deals</string>
     <string name="menu_food_list">Food List</string>
     <string name="action_search">Search</string>
+    <string name="menu_order">Orders</string>
+    <string name="menu_sign_out">Sign Out</string>
 </resources>

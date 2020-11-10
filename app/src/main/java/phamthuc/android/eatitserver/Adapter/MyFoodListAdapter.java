@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.List;
 
 import butterknife.BindView;
@@ -21,7 +19,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import phamthuc.android.eatitserver.Callback.IRecyclerClickListener;
 import phamthuc.android.eatitserver.Common.Common;
-import phamthuc.android.eatitserver.EventBus.FoodItemClick;
 import phamthuc.android.eatitserver.Model.FoodModel;
 import phamthuc.android.eatitserver.R;
 

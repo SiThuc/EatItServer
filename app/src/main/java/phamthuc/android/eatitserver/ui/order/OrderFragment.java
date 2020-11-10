@@ -1,4 +1,4 @@
-package phamthuc.android.eatitserver.ui.slideshow;
+package phamthuc.android.eatitserver.ui.order;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,15 +14,15 @@ import androidx.lifecycle.ViewModelProviders;
 
 import phamthuc.android.eatitserver.R;
 
-public class SlideshowFragment extends Fragment {
+public class OrderFragment extends Fragment {
 
-    private SlideshowViewModel slideshowViewModel;
+    private OrderViewModel slideshowViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         slideshowViewModel =
-                ViewModelProviders.of( this ).get( SlideshowViewModel.class );
-        View root = inflater.inflate( R.layout.fragment_slideshow, container, false );
+                ViewModelProviders.of( this ).get( OrderViewModel.class );
+        View root = inflater.inflate( R.layout.fragment_order, container, false );
         final TextView textView = root.findViewById( R.id.text_slideshow );
         slideshowViewModel.getText().observe( getViewLifecycleOwner(), new Observer<String>() {
             @Override
