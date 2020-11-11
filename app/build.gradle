@@ -55,4 +55,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
     implementation 'com.google.firebase:firebase-storage:19.2.0'
+
+    implementation 'com.karumi:dexter:6.2.1'
 }
