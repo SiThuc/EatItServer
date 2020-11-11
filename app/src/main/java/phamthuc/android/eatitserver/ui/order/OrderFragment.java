@@ -5,9 +5,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,8 +30,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -40,7 +42,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,13 +53,10 @@ import phamthuc.android.eatitserver.Adapter.MyOrderAdapter;
 import phamthuc.android.eatitserver.Common.BottomSheetOrderFragment;
 import phamthuc.android.eatitserver.Common.Common;
 import phamthuc.android.eatitserver.Common.MySwipeHelper;
-import phamthuc.android.eatitserver.EventBus.AddonSizeEditEvent;
 import phamthuc.android.eatitserver.EventBus.ChangeMenuClick;
 import phamthuc.android.eatitserver.EventBus.LoadOrderEvent;
-import phamthuc.android.eatitserver.Model.FoodModel;
 import phamthuc.android.eatitserver.Model.OrderModel;
 import phamthuc.android.eatitserver.R;
-import phamthuc.android.eatitserver.SizeAddonEditActivity;
 
 public class OrderFragment extends Fragment {
     @BindView( R.id.recycler_order )
@@ -85,10 +86,7 @@ public class OrderFragment extends Fragment {
                 adapter = new MyOrderAdapter( getContext(), orderModelList );
                 recycler_order.setAdapter( adapter );
                 recycler_order.setLayoutAnimation( layoutAnimationController );
-
-                txt_order_filter.setText( new StringBuilder( "Number of Orders (" )
-                .append( orderModelList.size())
-                .append(")"));
+                updateTextCounter();
             }
         } );
 
@@ -161,9 +159,7 @@ public class OrderFragment extends Fragment {
                                                 .addOnSuccessListener( aVoid -> {
                                                     adapter.removeItem(pos);
                                                     adapter.notifyItemRemoved( pos );
-                                                    txt_order_filter.setText( new StringBuilder( "Orders (")
-                                                    .append( adapter.getItemCount() )
-                                                    .append( ")" ));
+                                                    updateTextCounter();
                                                     dialogInterface.dismiss();
                                                     Toast.makeText(getContext(), "Order has been delete", Toast.LENGTH_SHORT ).show();
                                                 } );
@@ -179,10 +175,124 @@ public class OrderFragment extends Fragment {
 
                 buf.add(new MyButton( getContext(), "Edit", 30, 0, Color.parseColor("#336699"),
                         pos -> {
+                            showEditDialog(adapter.getItemAtPosition( pos ), pos);
 
                         }));
             }
         };
+    }
+
+    private void showEditDialog(OrderModel orderModel, int pos) {
+        View layout_dialog;
+        AlertDialog.Builder builder;
+        if(orderModel.getOrderStatus() == 0){
+            layout_dialog = LayoutInflater.from( getContext() ).inflate( R.layout.layout_dialog_shipping, null );
+            builder = new AlertDialog.Builder( getContext(), android.R.style.Theme_Material_Light_NoActionBar_Fullscreen )
+                    .setView( layout_dialog );
+        }else if(orderModel.getOrderStatus() == -1){
+            layout_dialog = LayoutInflater.from( getContext())
+                    .inflate( R.layout.layout_dialog_cancelled, null );
+            builder = new AlertDialog.Builder( getContext() )
+                    .setView( layout_dialog );
+        }else{
+            layout_dialog = LayoutInflater.from( getContext() )
+                    .inflate( R.layout.layout_dialog_shipped, null );
+            builder = new AlertDialog.Builder( getContext() )
+                    .setView( layout_dialog );
+        }
+
+        //View
+        Button btn_ok = (Button)layout_dialog.findViewById( R.id.btn_ok );
+        Button btn_cancel = (Button)layout_dialog.findViewById( R.id.btn_cancel );
+
+        RadioButton rdi_shipping = (RadioButton)layout_dialog.findViewById( R.id.rdi_shipping );
+        RadioButton rdi_shipped = (RadioButton)layout_dialog.findViewById( R.id.rdi_shipped );
+        RadioButton rdi_cancelled = (RadioButton)layout_dialog.findViewById( R.id.rdi_cancelled );
+        RadioButton rdi_delete = (RadioButton)layout_dialog.findViewById( R.id.rdi_delete );
+        RadioButton rdi_restore_placed = (RadioButton)layout_dialog.findViewById( R.id.rdi_restore_placed );
+
+        TextView txt_status = (TextView)layout_dialog.findViewById( R.id.txt_status );
+
+        //Set data
+        txt_status.setText( new StringBuilder( "Order Status (" )
+            .append( Common.convertStatusToString( orderModel.getOrderStatus() ) )
+            .append( ")" ));
+
+        //Create Dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        //Custom dialog
+        dialog.getWindow().setBackgroundDrawable( new ColorDrawable( Color.TRANSPARENT ) );
+        dialog.getWindow().setGravity( Gravity.CENTER );
+
+        btn_cancel.setOnClickListener( v -> {
+           dialog.dismiss();
+        } );
+        btn_ok.setOnClickListener( v -> {
+            dialog.dismiss();
+            if(rdi_cancelled != null && rdi_cancelled.isChecked())
+                updateOrder(pos, orderModel, -1);
+            else if(rdi_shipping != null && rdi_shipping.isChecked())
+                updateOrder(pos, orderModel, 1);
+            else if(rdi_shipped != null && rdi_shipped.isChecked())
+                updateOrder(pos, orderModel, 2);
+            else if(rdi_restore_placed != null && rdi_restore_placed.isChecked())
+                updateOrder(pos, orderModel, 0);
+            else if(rdi_delete != null && rdi_delete.isChecked())
+                deleteOrder(pos, orderModel);
+        } );
+    }
+
+    private void deleteOrder(int pos, OrderModel orderModel) {
+        if(!TextUtils.isEmpty( orderModel.getKey() )){
+            FirebaseDatabase.getInstance()
+                    .getReference(Common.ORDER_REF)
+                    .child( orderModel.getKey() )
+                    .removeValue()
+                    .addOnFailureListener( e -> {
+                        Toast.makeText( getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT ).show();
+                    } )
+                    .addOnSuccessListener( aVoid -> {
+                        adapter.removeItem( pos );
+                        adapter.notifyItemRemoved( pos );
+                        updateTextCounter();
+                        Toast.makeText( getContext(), "Delete order success", Toast.LENGTH_SHORT ).show();
+                    } );
+
+        }else{
+            Toast.makeText( getContext(), "Order number must not be null or empty", Toast.LENGTH_SHORT ).show();
+        }
+    }
+
+    private void updateOrder(int pos, OrderModel orderModel, int status){
+        if(!TextUtils.isEmpty( orderModel.getKey() )){
+            Map<String, Object> updateData = new HashMap<>(  );
+            updateData.put( "orderStatus", status );
+
+            FirebaseDatabase.getInstance()
+                    .getReference(Common.ORDER_REF)
+                    .child( orderModel.getKey() )
+                    .updateChildren( updateData )
+                    .addOnFailureListener( e -> {
+                        Toast.makeText( getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT ).show();
+                    } )
+                    .addOnSuccessListener( aVoid -> {
+                        adapter.removeItem( pos );
+                        adapter.notifyItemRemoved( pos );
+                        updateTextCounter();
+                        Toast.makeText( getContext(), "Update order success", Toast.LENGTH_SHORT ).show();
+                    } );
+
+        }else{
+            Toast.makeText( getContext(), "Order number must not be null or empty", Toast.LENGTH_SHORT ).show();
+        }
+    }
+
+    private void updateTextCounter() {
+        txt_order_filter.setText( new StringBuilder( "Number of Orders (" )
+                .append( adapter.getItemCount())
+                .append(")"));
+
     }
 
     @Override
