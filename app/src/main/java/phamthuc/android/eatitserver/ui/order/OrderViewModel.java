@@ -11,12 +11,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import phamthuc.android.eatitserver.Callback.IOrderCallbackListener;
 import phamthuc.android.eatitserver.Common.Common;
+import phamthuc.android.eatitserver.EventBus.LoadOrderEvent;
 import phamthuc.android.eatitserver.Model.OrderModel;
 
 public class OrderViewModel extends ViewModel implements IOrderCallbackListener {
@@ -33,11 +37,11 @@ public class OrderViewModel extends ViewModel implements IOrderCallbackListener 
     }
 
     public MutableLiveData<List<OrderModel>> getOrderModelMutableLiveData() {
-        loadOrderMyStatus(0);
+        loadOrderByStatus(0);
         return orderModelMutableLiveData;
     }
 
-    private void loadOrderMyStatus(int status) {
+    public void loadOrderByStatus(int status) {
         List<OrderModel> tempList = new ArrayList<>(  );
         Query orderRef = FirebaseDatabase.getInstance().getReference( Common.ORDER_REF)
                 .orderByChild("orderStatus")
@@ -80,4 +84,6 @@ public class OrderViewModel extends ViewModel implements IOrderCallbackListener 
     public void onOrderLoadFailed(String message) {
         messageError.setValue( message );
     }
+
+
 }
