@@ -10,8 +10,12 @@ import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -46,6 +50,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
 
+        subscribeToTopic( Common.createTopicOrder() );
+
         drawer = findViewById( R.id.drawer_layout );
         navigationView = findViewById( R.id.nav_view );
         // Passing each menu ID as a set of Ids because each
@@ -62,10 +68,22 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         navigationView.bringToFront();
 
         View headerView = navigationView.getHeaderView( 0 );
-        TextView txt_user = (TextView)headerView.findViewById( R.id.txt_user );
-        Common.setSpanString("Hey", Common.currentServerUser.getName(), txt_user); // Copy this function from client app
+        TextView txt_user = (TextView) headerView.findViewById( R.id.txt_user );
+        Common.setSpanString( "Hey", Common.currentServerUser.getName(), txt_user ); // Copy this function from client app
 
         menuClick = R.id.nav_category; // Default
+    }
+
+    private void subscribeToTopic(String topicOrder) {
+        FirebaseMessaging.getInstance()
+                .subscribeToTopic( topicOrder )
+                .addOnFailureListener( e -> {
+                    Toast.makeText( this, "" + e.getMessage(), Toast.LENGTH_SHORT ).show();
+                } )
+                .addOnCompleteListener( task -> {
+                    if (!task.isSuccessful())
+                        Toast.makeText( this, "Failed" + task.isSuccessful(), Toast.LENGTH_SHORT ).show();
+                } );
     }
 
     @Override
@@ -95,8 +113,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onCategoryClick(CategoryClick event) {
-        if(event.isSuccess()){
-            if(menuClick != R.id.nav_food_list){
+        if (event.isSuccess()) {
+            if (menuClick != R.id.nav_food_list) {
                 navController.navigate( R.id.nav_food_list );
                 menuClick = R.id.nav_food_list;
             }
@@ -105,9 +123,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onToastEvent(ToastEvent event) {
-        if(event.isUpdate()) {
+        if (event.isUpdate()) {
             Toast.makeText( this, "Update Success", Toast.LENGTH_SHORT ).show();
-        }else{
+        } else {
             Toast.makeText( this, "Delete Success", Toast.LENGTH_SHORT ).show();
         }
 
@@ -117,11 +135,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onChangeMenuClick(ChangeMenuClick event) {
-        if(event.isFromFoodList()){
+        if (event.isFromFoodList()) {
             //Clear
             navController.popBackStack( R.id.nav_category, true );
             navController.navigate( R.id.nav_category );
-        }else{
+        } else {
             navController.popBackStack( R.id.nav_food_list, true );
             navController.navigate( R.id.nav_food_list );
         }
@@ -132,15 +150,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         item.setChecked( true );
         drawer.closeDrawers();
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.nav_category:
-                if(item.getItemId() != menuClick) {
+                if (item.getItemId() != menuClick) {
                     navController.popBackStack(); // Remove all back stack
                     navController.navigate( R.id.nav_category );
                 }
                 break;
             case R.id.nav_order:
-                if(item.getItemId() != menuClick) {
+                if (item.getItemId() != menuClick) {
                     navController.popBackStack(); // Remove all back stack
                     navController.navigate( R.id.nav_order );
                 }
