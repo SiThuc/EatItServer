@@ -18,6 +18,8 @@ import android.text.style.StyleSpan;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
 import com.google.firebase.database.FirebaseDatabase;
 
 import phamthuc.android.eatitserver.Model.CategoryModel;
@@ -76,6 +78,7 @@ public class Common {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public static void showNotification(Context context, int id, String title, String content, Intent intent) {
         PendingIntent pendingIntent = null;
         if(intent != null)
