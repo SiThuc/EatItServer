@@ -27,7 +27,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,7 +59,6 @@ import butterknife.Unbinder;
 import dmax.dialog.SpotsDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import phamthuc.android.eatitserver.Adapter.MyOrderAdapter;
 import phamthuc.android.eatitserver.Adapter.MyShipperSelectionAdapter;
@@ -72,9 +70,9 @@ import phamthuc.android.eatitserver.EventBus.ChangeMenuClick;
 import phamthuc.android.eatitserver.EventBus.LoadOrderEvent;
 import phamthuc.android.eatitserver.Model.OrderModel;
 import phamthuc.android.eatitserver.Model.ShipperModel;
+import phamthuc.android.eatitserver.Model.ShippingOrderModel;
 import phamthuc.android.eatitserver.Model.TokenModel;
 import phamthuc.android.eatitserver.R;
-import phamthuc.android.eatitserver.Services.FCMResponse;
 import phamthuc.android.eatitserver.Services.FCMSendData;
 import phamthuc.android.eatitserver.Services.IFCMService;
 import phamthuc.android.eatitserver.Services.RetrofitFCMClient;
@@ -311,8 +309,8 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
                 if(myShipperSelectedAdapter != null) {
                     shipperModel = myShipperSelectedAdapter.getSelectedShipper();
                     if (shipperModel != null) {
-                        Toast.makeText(getContext(), "" + shipperModel.getName(), Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
+                        createShippingOrder(pos, shipperModel, orderModel, dialog);
+                        updateOrder(pos, orderModel, 1);
                     } else
                         Toast.makeText(getContext(), "Please select Shipper", Toast.LENGTH_SHORT).show();
                 }
@@ -331,6 +329,32 @@ public class OrderFragment extends Fragment implements IShipperLoadCallbackListe
             }
 
         });
+    }
+
+    private void createShippingOrder(int pos, ShipperModel shipperModel, OrderModel orderModel, AlertDialog dialog) {
+        ShippingOrderModel shippingOrder = new ShippingOrderModel();
+
+        shippingOrder.setShipperPhone(shipperModel.getPhone());
+        shippingOrder.setShipperName(shipperModel.getName());
+        shippingOrder.setOrderModel(orderModel);
+        shippingOrder.setStartTrip(false);
+        shippingOrder.setCurrentLat(-1.0);
+        shippingOrder.setCurrentLng(-1.0);
+
+        FirebaseDatabase.getInstance()
+                .getReference(Common.SHIPPING_ORDER_REF)
+                .push()
+                .setValue(shippingOrder)
+                .addOnFailureListener(e -> {
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                })
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        dialog.dismiss();
+                        updateOrder(pos, orderModel, 1);
+                    }
+                });
     }
 
     private void deleteOrder(int pos, OrderModel orderModel) {

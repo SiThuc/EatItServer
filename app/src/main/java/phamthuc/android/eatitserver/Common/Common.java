@@ -38,6 +38,7 @@ public class Common {
     public static final String NOTI_TITLE = "title";
     public static final String NOTI_CONTENT = "content";
     public static final String SHIPPER = "Shippers";
+    public static final String SHIPPING_ORDER_REF = "ShippingOrder";
     public static ServerUserModel currentServerUser;
     public static CategoryModel categorySelected;
     public static FoodModel selectedFood;
